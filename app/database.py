@@ -80,3 +80,62 @@ def create_tables():
                 ON DELETE CASCADE
         )
     """)
+
+# URL scan results table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS phish_urls (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT,
+            url VARCHAR(2000) NOT NULL,
+            risk_score INT NOT NULL,
+            risk_level VARCHAR(20) NOT NULL,
+            warnings TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+                ON DELETE SET NULL
+        )
+    """)
+
+    # Threat reports from users
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS threat_reports (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            reported_url VARCHAR(2000) NOT NULL,
+            threat_type VARCHAR(100),
+            description TEXT,
+            reporter_email VARCHAR(120),
+            status VARCHAR(20) DEFAULT 'pending',
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # Lesson votes — UNIQUE KEY means one vote per user per lesson
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS lesson_likes (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            lesson_id INT NOT NULL,
+            like_type VARCHAR(10) NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE KEY unique_vote (user_id, lesson_id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+                ON DELETE CASCADE,
+            FOREIGN KEY (lesson_id) REFERENCES topics(id)
+                ON DELETE CASCADE
+        )
+    """)
+
+    # Lesson comments
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS lesson_comments (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            lesson_id INT NOT NULL,
+            comment TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+                ON DELETE CASCADE,
+            FOREIGN KEY (lesson_id) REFERENCES topics(id)
+                ON DELETE CASCADE
+        )
+    """)
