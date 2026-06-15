@@ -1,6 +1,7 @@
 import pymysql
 import config
 
+
 def get_connection():
     try:
         return pymysql.connect(
@@ -13,30 +14,35 @@ def get_connection():
     except Exception as e:
         print("DB failed:", e)
 
+
 def create_tables():
-    # Create DB if missing
-    conn = pymysql.connect(host=config.MYSQL_HOST,
+    conn = pymysql.connect(
+        host=config.MYSQL_HOST,
         user=config.MYSQL_USER,
         password=config.MYSQL_PASSWORD,
         cursorclass=pymysql.cursors.DictCursor)
     cursor = conn.cursor()
     cursor.execute("CREATE DATABASE IF NOT EXISTS phishguard_db")
-    conn.commit(); cursor.close(); conn.close()
+    conn.commit()
+    cursor.close()
+    conn.close()
 
     conn = get_connection()
     cursor = conn.cursor()
-    # Users table — name email password role
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(100) NOT NULL UNIQUE,
-        password VARCHAR(255) NOT NULL,
-        role VARCHAR(20) DEFAULT 'user',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )""")
 
-# Topics table — stores all phishing lessons
+    # Users table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100) NOT NULL,
+            email VARCHAR(100) NOT NULL UNIQUE,
+            password VARCHAR(255) NOT NULL,
+            role VARCHAR(20) DEFAULT 'user',
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
+    # Topics table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS topics (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -66,7 +72,7 @@ def create_tables():
         )
     """)
 
-    # Quiz attempts — records every quiz score
+    # Quiz attempts table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS quiz_attempts (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -81,7 +87,7 @@ def create_tables():
         )
     """)
 
-# URL scan results table
+    # URL scan results table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS phish_urls (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -96,7 +102,7 @@ def create_tables():
         )
     """)
 
-    # Threat reports from users
+    # Threat reports table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS threat_reports (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -109,7 +115,7 @@ def create_tables():
         )
     """)
 
-    # Lesson votes — UNIQUE KEY means one vote per user per lesson
+    # Lesson likes table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS lesson_likes (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -125,7 +131,7 @@ def create_tables():
         )
     """)
 
-    # Lesson comments
+    # Lesson comments table
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS lesson_comments (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -139,3 +145,30 @@ def create_tables():
                 ON DELETE CASCADE
         )
     """)
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+    _seed_admin()
+
+
+def _seed_admin():
+    """Creates default admin if not exists."""
+    conn   = get_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT * FROM users WHERE email = %s",
+        ("admin@admin.com",)
+    )
+    if not cursor.fetchone():
+        from werkzeug.security import generate_password_hash
+        cursor.execute(
+            "INSERT INTO users (name, email, password, role)"
+            " VALUES (%s, %s, %s, %s)",
+            ("Admin", "admin@admin.com",
+             generate_password_hash("admin123"), "admin"),
+        )
+        conn.commit()
+        print("Admin created: admin@admin.com / admin123")
+    cursor.close()
+    conn.close()
