@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}PhishGuard — Cybersecurity Phishing Education{% endblock %}
+{% block content %}
+
+<div style="border:1px solid var(--border); border-radius:16px; padding:40px; margin-bottom:24px; background:var(--bg2);">
+
+  <div style="display:inline-flex; align-items:center; gap:6px; font-size:0.75rem; padding:4px 12px; border-radius:100px; border:1px solid var(--border2); color:var(--muted); margin-bottom:16px; font-family:'JetBrains Mono',monospace;">
+    <span style="width:6px; height:6px; border-radius:50%; background:var(--green);"></span>
+    CYBERSECURITY EDUCATION PLATFORM
+  </div>
+
+  <h1 style="font-size:clamp(1.8rem, 4vw, 2.8rem); font-weight:700; line-height:1.25; margin-bottom:12px; color:var(--text);">
+    Learn to Detect and <span style="color:var(--cyan);">Defend Against</span> Phishing Attacks
+  </h1>
+
+  <p style="font-size:1rem; color:var(--text2); max-width:480px; margin-bottom:24px; line-height:1.7;">
+    PhishGuard gives you the knowledge and tools to recognize, analyze, and stop phishing attacks before they cause damage.
+  </p>
+
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:28px;">
+    <a href="/lessons/" class="btn btn-primary">Start Learning Free</a>
+    <a href="/scan/" class="btn btn-secondary">Scan a URL</a>
+    {% if not current_user %}
+    <a href="/auth/register" class="btn btn-secondary">Create Account</a>
+    {% endif %}
+  </div>
+
+  <div style="display:flex; gap:24px; flex-wrap:wrap;">
+    <div>
+      <span style="font-size:1.4rem; font-weight:700; color:var(--cyan); font-family:'JetBrains Mono',monospace;">{{ stats.lessons }}</span>
+      <span style="font-size:0.75rem; color:var(--muted); margin-left:5px; text-transform:uppercase; letter-spacing:0.06em;">Lessons</span>
+    </div>
+    <div>
+      <span style="font-size:1.4rem; font-weight:700; color:var(--green); font-family:'JetBrains Mono',monospace;">{{ stats.questions }}</span>
+      <span style="font-size:0.75rem; color:var(--muted); margin-left:5px; text-transform:uppercase; letter-spacing:0.06em;">Quiz Questions</span>
+    </div>
+    <div>
+      <span style="font-size:1.4rem; font-weight:700; color:#a78bfa; font-family:'JetBrains Mono',monospace;">{{ stats.users }}</span>
+      <span style="font-size:0.75rem; color:var(--muted); margin-left:5px; text-transform:uppercase; letter-spacing:0.06em;">Learners</span>
+    </div>
+    <div>
+      <span style="font-size:1.4rem; font-weight:700; color:var(--yellow); font-family:'JetBrains Mono',monospace;">{{ stats.scans }}</span>
+      <span style="font-size:0.75rem; color:var(--muted); margin-left:5px; text-transform:uppercase; letter-spacing:0.06em;">URLs Scanned</span>
+    </div>
+  </div>
+
+</div>
+
+<div style="border:1px solid rgba(255,56,96,0.2); border-radius:10px; padding:12px 16px; margin-bottom:24px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+  <span style="background:var(--red); color:#fff; font-size:0.7rem; font-weight:700; padding:2px 8px; border-radius:4px; font-family:'JetBrains Mono',monospace; white-space:nowrap;">THREAT ALERT</span>
+  <span style="font-size:0.875rem; color:var(--text2); flex:1;">Phishing attacks increased <strong style="color:var(--red);">61%</strong> in 2023. Knowledge is your most powerful defense.</span>
+  <a href="/lessons/" style="font-size:0.82rem; color:var(--cyan); font-weight:600; white-space:nowrap;">Learn more</a>
+</div>
+
+<div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+  <h2 style="font-size:1.1rem; font-weight:700; color:var(--text); white-space:nowrap;">Platform Features</h2>
+  <div style="flex:1; height:1px; background:var(--border);"></div>
+</div>
+
+<div class="feature-grid">
+
+  <a href="/lessons/" class="feature-card">
+    <h3>Phishing Lessons</h3>
+    <p>8 lessons covering basic to advanced phishing techniques with real-world examples.</p>
+    <div style="margin-top:12px; font-size:0.78rem; color:var(--cyan); font-weight:600; font-family:'JetBrains Mono',monospace;">VIEW LESSONS</div>
+  </a>
+
+  <a href="/quiz/" class="feature-card">
+    <h3>Knowledge Quiz</h3>
+    <p>Test your knowledge with 15 questions across beginner, intermediate, and advanced levels.</p>
+    <div style="margin-top:12px; font-size:0.78rem; color:var(--cyan); font-weight:600; font-family:'JetBrains Mono',monospace;">TAKE QUIZ</div>
+  </a>
+
+  <a href="/scan/" class="feature-card">
+    <h3>URL Scanner</h3>
+    <p>Analyze any URL for phishing risk — checks HTTPS, suspicious keywords, and typosquatting.</p>
+    <div style="margin-top:12px; font-size:0.78rem; color:var(--cyan); font-weight:600; font-family:'JetBrains Mono',monospace;">SCAN A URL</div>
+  </a>
+
+  <a href="/scan/email" class="feature-card">
+    <h3>Email Header Analyzer</h3>
+    <p>Check raw email headers for SPF, DKIM, and urgency phrases that signal phishing attempts.</p>
+    <div style="margin-top:12px; font-size:0.78rem; color:var(--cyan); font-weight:600; font-family:'JetBrains Mono',monospace;">ANALYZE HEADERS</div>
+  </a>
+
+  <a href="/report/" class="feature-card">
+    <h3>Threat Reporting</h3>
+    <p>Report suspicious URLs to help protect others from the same phishing attacks.</p>
+    <div style="margin-top:12px; font-size:0.78rem; color:var(--cyan); font-weight:600; font-family:'JetBrains Mono',monospace;">REPORT A THREAT</div>
+  </a>
+
+  <a href="/auth/register" class="feature-card">
+    <h3>Progress Tracking</h3>
+    <p>Create a free account to track your quiz attempts and scan history over time.</p>
+    <div style="margin-top:12px; font-size:0.78rem; color:var(--cyan); font-weight:600; font-family:'JetBrains Mono',monospace;">CREATE ACCOUNT</div>
+  </a>
+
+</div>
+
+{% endblock %}
