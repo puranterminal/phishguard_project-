@@ -26,23 +26,21 @@ def create_app():
         return {"current_user": g.get("current_user")}
 
     @app.before_request
-    def csrf_protect():
+    def generate_csrf_token():
         if "csrf_token" not in session:
             session["csrf_token"] = os.urandom(16).hex()
-        if request.method == "POST":
-            token = request.form.get("csrf_token")
-            if not token or token != session.get("csrf_token"):
-                abort(403)
 
-    # Register blueprints
-    from app.routes import authRoutes, lessonRoutes, quizRoutes, scanRoutes, reportRoutes, adminRoutes, mainRoutes
-    app.register_blueprint(mainRoutes.register())                        # / (root)
-    app.register_blueprint(authRoutes.register(), url_prefix="/auth")
+    from app.routes import (
+        authRoutes, lessonRoutes, quizRoutes,
+        scanRoutes, reportRoutes, adminRoutes, mainRoutes
+    )
+    app.register_blueprint(mainRoutes.register())
+    app.register_blueprint(authRoutes.register(),   url_prefix="/auth")
     app.register_blueprint(lessonRoutes.register(), url_prefix="/lessons")
-    app.register_blueprint(quizRoutes.register(), url_prefix="/quiz")
-    app.register_blueprint(scanRoutes.register(), url_prefix="/scan")
+    app.register_blueprint(quizRoutes.register(),   url_prefix="/quiz")
+    app.register_blueprint(scanRoutes.register(),   url_prefix="/scan")
     app.register_blueprint(reportRoutes.register(), url_prefix="/report")
-    app.register_blueprint(adminRoutes.register(), url_prefix="/admin")
+    app.register_blueprint(adminRoutes.register(),  url_prefix="/admin")
 
     @app.errorhandler(403)
     def forbidden(e):
