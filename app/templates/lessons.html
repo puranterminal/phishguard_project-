@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Lessons — PhishGuard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>📚 Phishing Lessons</h1>
+    <p>{{ lessons|length }} lessons — beginner to advanced</p>
+  </div>
+</div>
+<div class="d-flex gap-1 mb-3" style="flex-wrap:wrap;">
+  <span class="badge badge-beginner" style="padding:5px 12px;">🟢 Beginner</span>
+  <span class="badge badge-intermediate" style="padding:5px 12px;">🟡 Intermediate</span>
+  <span class="badge badge-advanced" style="padding:5px 12px;">🔴 Advanced</span>
+</div>
+<div class="lessons-grid">
+  {% for lesson in lessons %}
+  <a href="/lessons/{{ lesson.id }}" class="lesson-card">
+    <span class="badge badge-{{ lesson.difficulty }}">{{ lesson.difficulty|capitalize }}</span>
+    <h3>{{ lesson.title }}</h3>
+    <p>Lesson {{ lesson.order_num }}</p>
+  </a>
+  {% else %}
+  <p class="text-muted">No lessons found.</p>
+  {% endfor %}
+</div>
+{% endblock %}
