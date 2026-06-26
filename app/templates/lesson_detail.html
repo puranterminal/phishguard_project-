@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}{{ lesson.title }} — PhishGuard{% endblock %}
+{% block content %}
+
+<div class="d-flex align-center gap-1 mb-2" style="flex-wrap:wrap;">
+  <a href="/lessons/" style="font-size:0.85rem; color:#64748b;">Back to Lessons</a>
+  <span style="color:#cbd5e1;">|</span>
+  <span class="badge badge-{{ lesson.difficulty }}">{{ lesson.difficulty|capitalize }}</span>
+</div>
+
+<h1 style="font-size:1.5rem; font-weight:700; margin-bottom:20px; color:#0f172a;">{{ lesson.title }}</h1>
+
+<div class="lesson-content">
+  {{ lesson.content | safe }}
+</div>
+
+<div class="vote-row">
+  <span style="font-size:0.85rem; color:#64748b; font-weight:500;">Was this helpful?</span>
+  <button class="vote-btn {% if user_vote == 'like' %}liked{% endif %}" id="btn-like" onclick="doVote('like')">
+    Like <span id="like-count">{{ likes }}</span>
+  </button>
+  <button class="vote-btn {% if user_vote == 'dislike' %}disliked{% endif %}" id="btn-dislike" onclick="doVote('dislike')">
+    Dislike <span id="dislike-count">{{ dislikes }}</span>
+  </button>
+</div>
+
+<div class="d-flex justify-between mb-3" style="flex-wrap:wrap; gap:8px;">
+  {% if prev_lesson %}
+  <a href="/lessons/{{ prev_lesson.id }}" class="btn btn-secondary">Previous: {{ prev_lesson.title }}</a>
+  {% else %}<span></span>{% endif %}
+  {% if next_lesson %}
+  <a href="/lessons/{{ next_lesson.id }}" class="btn btn-primary">Next: {{ next_lesson.title }}</a>
+  {% endif %}
+</div>
+
+<h3 style="font-size:1.1rem; font-weight:700; margin-bottom:14px; color:#0f172a;">Comments ({{ comments|length }})</h3>
+
+{% if current_user %}
+<div class="card mb-2">
+  <form method="POST" action="/lessons/{{ lesson.id }}/comment">
+    <div class="form-group">
+      <textarea name="comment" class="form-control" rows="3" placeholder="Share your thoughts or questions..." required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary btn-sm">Post Comment</button>
+  </form>
+</div>
+{% else %}
+<div class="card mb-2">
+  <p style="font-size:0.875rem; color:#64748b;"><a href="/auth/login">Login</a> to leave a comment.</p>
+</div>
+{% endif %}
+
+{% for c in comments %}
+<div class="comment-item">
+  <div class="comment-meta">
+    <strong>{{ c.username }}</strong> &nbsp;·&nbsp; {{ c.created_at }}
+  </div>
+  <div class="comment-text">{{ c.comment }}</div>
+  {% if current_user and (current_user.id == c.user_id or current_user.role == 'admin') %}
+  <form method="POST" action="/lessons/comment/{{ c.id }}/delete" style="margin-top:8px;">
+    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this comment?')">Delete</button>
+  </form>
+  {% endif %}
+</div>
+{% else %}
+<p class="text-muted" style="font-size:0.875rem;">No comments yet. Be the first!</p>
+{% endfor %}
+
+{% endblock %}
+{% block scripts %}
+<script>
+var lessonId = {{ lesson.id }};
+var isLoggedIn = {{ 'true' if current_user else 'false' }};
+var csrfToken = "{{ session.get('csrf_token', '') }}";
+
+async function doVote(type) {
+  if (!isLoggedIn) { window.location.href = '/auth/login'; return; }
+  var fd = new FormData();
+  fd.append('type', type);
+  fd.append('csrf_token', csrfToken);
+  var res = await fetch('/lessons/' + lessonId + '/vote', { method: 'POST', body: fd });
+  if (res.ok) {
+    var data = await res.json();
+    document.getElementById('like-count').textContent = data.likes;
+    document.getElementById('dislike-count').textContent = data.dislikes;
+    document.getElementById('btn-like').className = 'vote-btn' + (data.user_vote === 'like' ? ' liked' : '');
+    document.getElementById('btn-dislike').className = 'vote-btn' + (data.user_vote === 'dislike' ? ' disliked' : '');
+  }
+}
+</script>
+{% endblock %}
