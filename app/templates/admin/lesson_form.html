@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Edit' if lesson else 'New' }} Lesson — PhishGuard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>{{ 'Edit' if lesson else 'New' }} Lesson</h1>
+  <a href="/lessons/admin" class="btn btn-secondary">Back</a>
+</div>
+<div class="card" style="max-width:800px;">
+  <form method="POST">
+    <div class="form-group">
+      <label class="form-label">Title</label>
+      <input type="text" name="title" class="form-control" value="{{ lesson.title if lesson else '' }}" required>
+    </div>
+    <div class="grid-2">
+      <div class="form-group">
+        <label class="form-label">Difficulty</label>
+        <select name="difficulty" class="form-select">
+          {% for d in ['beginner','intermediate','advanced'] %}
+          <option value="{{ d }}" {% if lesson and lesson.difficulty == d %}selected{% endif %}>{{ d|capitalize }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Order Number</label>
+        <input type="number" name="order_num" class="form-control" value="{{ lesson.order_num if lesson else '' }}" required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Content (HTML supported)</label>
+      <textarea name="content" class="form-control" rows="18" required>{{ lesson.content if lesson else '' }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">{{ 'Update' if lesson else 'Create' }} Lesson</button>
+    <a href="/lessons/admin" class="btn btn-secondary" style="margin-left:8px;">Cancel</a>
+  </form>
+</div>
+{% endblock %}
