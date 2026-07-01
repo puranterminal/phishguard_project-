@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}Quiz — PhishGuard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Phishing Quiz</h1>
+    <p>{{ questions|length }} questions · Score 60% or more to pass</p>
+  </div>
+</div>
+
+{% if past_attempts %}
+<div class="card mb-3">
+  <p style="font-size:0.82rem; font-weight:700; color:#64748b; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;">Your Past Attempts</p>
+  <div class="d-flex gap-1" style="flex-wrap:wrap;">
+    {% for a in past_attempts %}
+    <span class="badge {% if a.passed %}badge-beginner{% else %}badge-advanced{% endif %}" style="padding:5px 10px; font-size:0.8rem;">
+      {{ a.score }}/{{ a.total_questions }} · {{ a.percentage }}% · {% if a.passed %}PASS{% else %}FAIL{% endif %}
+    </span>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<form method="POST" action="/quiz/submit">
+  {% for t_key, t_label in [('beginner','Beginner'), ('intermediate','Intermediate'), ('advanced','Advanced')] %}
+  <div style="margin:24px 0 12px; padding-bottom:8px; border-bottom:1px solid #334155; display:flex; align-items:center; gap:10px;">
+    <span class="badge badge-{{ t_key }}" style="padding:5px 12px;">{{ t_label }}</span>
+    <span style="font-size:0.82rem; color:#64748b;">Questions</span>
+  </div>
+  {% set ns = namespace(count=0) %}
+  {% for q in questions if q.question_type == t_key %}
+    {% set ns.count = ns.count + 1 %}
+    <div class="quiz-question">
+      <div style="font-size:0.75rem; color:#64748b; margin-bottom:6px;">{{ t_label }} · Question {{ ns.count }}</div>
+      <h4 style="font-size:0.95rem; font-weight:600; color:#f1f5f9; margin-bottom:12px;">{{ q.question }}</h4>
+      <div>
+        {% for i in range(1, 5) %}
+        <label class="quiz-option">
+          <input type="radio" name="q_{{ q.id }}" value="{{ i }}" required>
+          {{ [q.option1, q.option2, q.option3, q.option4][i-1] }}
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+  {% endfor %}
+
+  <div class="text-center mt-3">
+    <button type="submit" class="btn btn-primary" style="padding:10px 40px;">Submit Quiz</button>
+  </div>
+</form>
+{% endblock %}
