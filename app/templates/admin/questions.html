@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Quiz Questions — PhishGuard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Quiz Questions</h1><p>{{ questions|length }} questions total</p></div>
+  <a href="/quiz/admin/new" class="btn btn-primary">New Question</a>
+</div>
+<div class="card" style="padding:0; overflow:hidden;">
+  <table class="table">
+    <thead><tr><th>ID</th><th>Question</th><th>Difficulty</th><th>Answer</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for q in questions %}
+      <tr>
+        <td class="mono" style="font-size:0.82rem;">{{ q.id }}</td>
+        <td style="font-size:0.85rem; color:#94a3b8; max-width:300px;">{{ q.question[:70] }}{% if q.question|length > 70 %}...{% endif %}</td>
+        <td><span class="badge badge-{{ q.question_type }}">{{ q.question_type|capitalize }}</span></td>
+        <td style="font-family:'Courier New',monospace; color:#94a3b8;">Option {{ q.correct_answer }}</td>
+        <td class="d-flex gap-1">
+          <a href="/quiz/admin/{{ q.id }}/edit" class="btn btn-secondary btn-sm">Edit</a>
+          <form method="POST" action="/quiz/admin/{{ q.id }}/delete" style="display:inline;">
+            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete?')">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
