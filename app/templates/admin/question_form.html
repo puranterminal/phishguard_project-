@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}{{ 'Edit' if question else 'New' }} Question — PhishGuard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>{{ 'Edit' if question else 'New' }} Question</h1>
+  <a href="/quiz/admin" class="btn btn-secondary">Back</a>
+</div>
+<div class="card" style="max-width:680px;">
+  <form method="POST">
+    <div class="form-group">
+      <label class="form-label">Question Text</label>
+      <textarea name="question" class="form-control" rows="3" required>{{ question.question if question else '' }}</textarea>
+    </div>
+    {% for i in range(1,5) %}
+    <div class="form-group">
+      <label class="form-label">Option {{ i }}</label>
+      <input type="text" name="option{{ i }}" class="form-control" value="{{ question['option' ~ i] if question else '' }}" required>
+    </div>
+    {% endfor %}
+    <div class="grid-2">
+      <div class="form-group">
+        <label class="form-label">Correct Answer</label>
+        <select name="correct_answer" class="form-select">
+          {% for i in range(1,5) %}
+          <option value="{{ i }}" {% if question and question.correct_answer == i %}selected{% endif %}>Option {{ i }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Difficulty</label>
+        <select name="question_type" class="form-select">
+          {% for d in ['beginner','intermediate','advanced'] %}
+          <option value="{{ d }}" {% if question and question.question_type == d %}selected{% endif %}>{{ d|capitalize }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Explanation (shown after quiz)</label>
+      <textarea name="explanation" class="form-control" rows="3">{{ question.explanation if question else '' }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">{{ 'Update' if question else 'Create' }} Question</button>
+    <a href="/quiz/admin" class="btn btn-secondary" style="margin-left:8px;">Cancel</a>
+  </form>
+</div>
+{% endblock %}
