@@ -1,4 +1,5 @@
 import os
+from app.models import db
 from flask import Flask, render_template, session, request, abort, g
 import config
 from app.database import create_tables
@@ -8,6 +9,9 @@ from app.repository.user_repo import get_user_by_id
 def create_app():
     app = Flask(__name__)
     app.secret_key = config.SECRET_KEY
+    app.config["SQLALCHEMY_DATABASE_URI"] = config.SQLALCHEMY_DATABASE_URI
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = config.SQLALCHEMY_TRACK_MODIFICATIONS
+    db.init_app(app)
     app.config["SESSION_COOKIE_HTTPONLY"] = True
     app.config["SESSION_COOKIE_SECURE"] = False
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
