@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Email Analyzer — PhishGuard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Email Header Analyzer</h1>
+    <p>Check SPF, DKIM, and urgency signals in email headers</p>
+  </div>
+</div>
+
+<div class="grid-2" style="align-items:start;">
+  <div>
+    <div class="card">
+      <form method="POST" action="/scan/email">
+        <div class="form-group">
+          <label class="form-label">Paste Email Headers</label>
+          <textarea name="headers" class="form-control" rows="12"
+            placeholder="Received: from mail.example.com...&#10;Authentication-Results: mx.google.com;&#10;  spf=pass ...&#10;  dkim=pass ..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Analyze Headers</button>
+      </form>
+    </div>
+
+    {% if result %}
+    <div class="scan-result mt-2">
+      <div class="d-flex justify-between align-center mb-2" style="flex-wrap:wrap; gap:8px;">
+        <strong>Analysis Result</strong>
+        <span class="badge badge-{% if result.risk_level == 'LOW' %}beginner{% elif result.risk_level == 'MEDIUM' %}intermediate{% else %}advanced{% endif %}" style="padding:5px 12px;">
+          {{ result.risk_level }} · Score: {{ result.risk_score }}
+        </span>
+      </div>
+      {% if result.warnings %}
+      <ul style="padding-left:18px; font-size:0.85rem; color:#94a3b8;">
+        {% for w in result.warnings %}<li style="margin-bottom:4px;">{{ w }}</li>{% endfor %}
+      </ul>
+      {% else %}
+      <p style="color:#4ade80; font-weight:600;">No significant red flags detected in headers.</p>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+  <div>
+    <div class="card mb-2">
+      <h3 style="font-size:1rem; font-weight:600; margin-bottom:12px;">What We Check</h3>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div style="background:#1e293b; border:1px solid #334155; border-radius:6px; padding:10px 12px;">
+          <p style="font-size:0.82rem; font-weight:600; color:#60a5fa; margin-bottom:2px;">SPF (Sender Policy Framework)</p>
+          <p style="font-size:0.8rem; color:#94a3b8;">Verifies the sending server is authorized. SPF fail means likely spoofed.</p>
+        </div>
+        <div style="background:#1e293b; border:1px solid #334155; border-radius:6px; padding:10px 12px;">
+          <p style="font-size:0.82rem; font-weight:600; color:#60a5fa; margin-bottom:2px;">DKIM Signature</p>
+          <p style="font-size:0.8rem; color:#94a3b8;">Confirms email was not tampered with during transit.</p>
+        </div>
+        <div style="background:#1e293b; border:1px solid #334155; border-radius:6px; padding:10px 12px;">
+          <p style="font-size:0.82rem; font-weight:600; color:#fbbf24; margin-bottom:2px;">Urgency Phrases</p>
+          <p style="font-size:0.8rem; color:#94a3b8;">High-pressure words like "verify now" or "account suspended".</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="font-size:1rem; font-weight:600; margin-bottom:10px;">How to Get Headers</h3>
+      <ul style="font-size:0.85rem; padding-left:18px; color:#94a3b8;">
+        <li><strong style="color:#e2e8f0;">Gmail:</strong> Open email, click 3 dots, then Show original</li>
+        <li style="margin-top:6px;"><strong style="color:#e2e8f0;">Outlook:</strong> File, Properties, Internet headers</li>
+        <li style="margin-top:6px;"><strong style="color:#e2e8f0;">Apple Mail:</strong> View, Message, All Headers</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
