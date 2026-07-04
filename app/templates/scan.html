@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}URL Scanner — PhishGuard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>URL Scanner</h1>
+    <p>Paste any URL to check for phishing signals</p>
+  </div>
+</div>
+
+<div class="card">
+  <form method="POST" action="/scan/">
+    <div class="form-group">
+      <label class="form-label">Enter URL to Analyze</label>
+      <div class="d-flex gap-1" style="flex-wrap:wrap;">
+        <input type="text" name="url" class="form-control" placeholder="https://example.com/verify-account..." required style="flex:1; min-width:200px;">
+        <button type="submit" class="btn btn-primary">Analyze</button>
+      </div>
+    </div>
+    <p class="text-muted" style="font-size:0.78rem;">Checks: HTTPS, suspicious keywords, URL length, IP addresses, typosquatting</p>
+  </form>
+</div>
+
+{% if result %}
+<div class="scan-result">
+  <div class="d-flex justify-between align-center mb-2" style="flex-wrap:wrap; gap:8px;">
+    <strong style="font-size:1rem;">Scan Result</strong>
+    <span class="badge badge-{% if result.risk_level == 'LOW' %}beginner{% elif result.risk_level == 'MEDIUM' %}intermediate{% else %}advanced{% endif %}" style="padding:5px 12px;">
+      {{ result.risk_level }} RISK · Score: {{ result.risk_score }}
+    </span>
+  </div>
+  <p style="font-size:0.82rem; word-break:break-all; padding:8px 12px; border-radius:6px; margin-bottom:10px; border:1px solid #334155; background:#0f172a;">{{ result.url }}</p>
+  {% if result.risk_level == 'LOW' %}
+    <p style="color:#4ade80; font-weight:600;">This URL appears safe. No major phishing signals detected.</p>
+  {% elif result.risk_level == 'MEDIUM' %}
+    <p style="color:#fbbf24; font-weight:600;">This URL has suspicious characteristics. Proceed with caution.</p>
+  {% else %}
+    <p style="color:#f87171; font-weight:600;">HIGH RISK — Multiple phishing indicators detected. Do not visit this URL.</p>
+  {% endif %}
+  {% if result.warnings %}
+  <ul style="margin-top:10px; padding-left:18px; font-size:0.85rem; color:#94a3b8;">
+    {% for w in result.warnings %}<li style="margin-bottom:4px;">{{ w }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if scans %}
+<h3 style="font-size:1.1rem; font-weight:600; margin:20px 0 12px;">Your Scan History</h3>
+<div class="card" style="padding:0; overflow:hidden;">
+  <table class="table">
+    <thead><tr><th>URL</th><th>Risk Level</th><th>Score</th><th>Date</th><th>Action</th></tr></thead>
+    <tbody>
+      {% for s in scans %}
+      <tr>
+        <td style="font-size:0.78rem; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ s.url }}</td>
+        <td><span class="badge badge-{% if s.risk_level == 'LOW' %}beginner{% elif s.risk_level == 'MEDIUM' %}intermediate{% else %}advanced{% endif %}">{{ s.risk_level }}</span></td>
+        <td style="color:#94a3b8;">{{ s.risk_score }}</td>
+        <td style="font-size:0.78rem; color:#64748b;">{{ s.created_at }}</td>
+        <td>
+          <form method="POST" action="/scan/delete/{{ s.id }}" style="display:inline;">
+            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this scan record?')">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% elif current_user %}
+<p class="text-muted mt-2" style="font-size:0.875rem;">No scans yet. Your history will appear here.</p>
+{% else %}
+<p class="text-muted mt-2" style="font-size:0.875rem;"><a href="/auth/login">Login</a> to save your scan history.</p>
+{% endif %}
+
+<div class="card mt-3 d-flex align-center gap-2" style="flex-wrap:wrap;">
+  <strong style="font-size:0.82rem;">Risk Scale:</strong>
+  <span class="badge badge-beginner">0–29 LOW — Appears Safe</span>
+  <span class="badge badge-intermediate">30–59 MEDIUM — Be Cautious</span>
+  <span class="badge badge-advanced">60+ HIGH — Phishing!</span>
+</div>
+{% endblock %}
