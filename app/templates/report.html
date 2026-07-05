@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Report Threat — PhishGuard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Report a Phishing Threat</h1>
+    <p>Help protect others by reporting suspicious URLs</p>
+  </div>
+</div>
+
+<div class="grid-2" style="align-items:start;">
+  <div class="card">
+    <form method="POST" action="/report/">
+      <div class="form-group">
+        <label class="form-label">Suspicious URL *</label>
+        <input type="url" name="url" class="form-control" placeholder="https://suspicious-site.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Threat Type</label>
+        <select name="threat_type" class="form-select">
+          <option value="phishing">Phishing Website</option>
+          <option value="smishing">Smishing (SMS)</option>
+          <option value="malware">Malware Distribution</option>
+          <option value="scam">Online Scam</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea name="description" class="form-control" rows="4" placeholder="Describe what made this suspicious..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Email <span class="text-muted">(optional, for follow-up)</span></label>
+        <input type="email" name="email" class="form-control" placeholder="your@email.com">
+      </div>
+      <button type="submit" class="btn btn-danger w-full">Submit Report</button>
+    </form>
+  </div>
+
+  <div>
+    <div class="card mb-2">
+      <h3 style="font-size:1rem; font-weight:600; margin-bottom:10px;">Why Report?</h3>
+      <ul style="font-size:0.875rem; padding-left:18px; color:#94a3b8; line-height:2;">
+        <li>Protect others from the same attack</li>
+        <li>Build a database of known threats</li>
+        <li>Help authorities track cybercriminals</li>
+        <li>Improve automated detection systems</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="font-size:1rem; font-weight:600; margin-bottom:10px;">What to Include</h3>
+      <ul style="font-size:0.875rem; padding-left:18px; color:#94a3b8; line-height:2;">
+        <li>The exact URL from your browser bar</li>
+        <li>How you received it (email, SMS, social media)</li>
+        <li>What organization it was pretending to be</li>
+        <li>Any other suspicious details</li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
