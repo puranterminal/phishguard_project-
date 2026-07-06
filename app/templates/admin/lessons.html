@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Manage Lessons — PhishGuard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Manage Lessons</h1><p>{{ lessons|length }} lessons total</p></div>
+  <a href="/lessons/admin/new" class="btn btn-primary">New Lesson</a>
+</div>
+<div class="card" style="padding:0; overflow:hidden;">
+  <table class="table">
+    <thead><tr><th>ID</th><th>Title</th><th>Difficulty</th><th>Order</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for l in lessons %}
+      <tr>
+        <td class="mono" style="font-size:0.82rem;">{{ l.id }}</td>
+        <td><a href="/lessons/{{ l.id }}" style="font-weight:600; color:#f1f5f9;">{{ l.title }}</a></td>
+        <td><span class="badge badge-{{ l.difficulty }}">{{ l.difficulty|capitalize }}</span></td>
+        <td class="mono">{{ l.order_num }}</td>
+        <td class="d-flex gap-1">
+          <a href="/lessons/admin/{{ l.id }}/edit" class="btn btn-secondary btn-sm">Edit</a>
+          <form method="POST" action="/lessons/admin/{{ l.id }}/delete" style="display:inline;">
+            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this lesson?')">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
