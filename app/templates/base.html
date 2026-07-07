@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}PhishGuard{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="/" class="brand">
+    <div class="brand-dot"></div>
+    PhishGuard
+  </a>
+  <div class="nav-links">
+    <a href="/lessons/">Lessons</a>
+    <a href="/quiz/">Quiz</a>
+    <a href="/scan/">Scanner</a>
+    <a href="/scan/email">Email</a>
+    <a href="/report/">Report</a>
+    {% if current_user %}
+      {% if current_user.role == 'admin' %}
+        <a href="/auth/dashboard">Users</a>
+        <a href="/admin/">Admin</a>
+      {% endif %}
+      <a href="/auth/profile">{{ current_user.name }}</a>
+      <a href="/auth/logout" class="btn-nav">Logout</a>
+    {% else %}
+      <a href="/auth/login">Login</a>
+      <a href="/auth/register" class="btn-nav">Register</a>
+    {% endif %}
+  </div>
+</nav>
+
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</div>
+
+<footer>
+  PhishGuard &nbsp;·&nbsp; Cybersecurity Phishing Education Platform &nbsp;·&nbsp; Stay Safe Online
+</footer>
+
+<script>
+  var csrfToken = "{{ session.get('csrf_token', '') }}";
+  document.querySelectorAll('form[method="POST"], form[method="post"]').forEach(function(form) {
+    if (!form.querySelector('input[name="csrf_token"]')) {
+      var input = document.createElement('input');
+      input.type  = 'hidden';
+      input.name  = 'csrf_token';
+      input.value = csrfToken;
+      form.appendChild(input);
+    }
+  });
+</script>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>
