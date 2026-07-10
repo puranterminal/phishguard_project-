@@ -1,9 +1,12 @@
-SECRET_KEY = "phishguard-secret-2024"
+import os
+from dotenv import load_dotenv
 
-MYSQL_HOST = "localhost"
-MYSQL_USER = "root"
-MYSQL_PASSWORD = "root1234"
-MYSQL_DATABASE = "phishguard_db"
+load_dotenv()
 
-SQLALCHEMY_DATABASE_URI = "mysql+pymysql://root:root1234@localhost/phishguard_db"
+SECRET_KEY = os.getenv("SECRET_KEY")
+MYSQL_HOST = os.getenv("MYSQL_HOST")
+MYSQL_USER = os.getenv("MYSQL_USER")
+MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
+MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
+SQLALCHEMY_DATABASE_URI = os.getenv("SQLALCHEMY_DATABASE_URI")
 SQLALCHEMY_TRACK_MODIFICATIONS = False
