@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Admin Panel — PhishGuard{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1> Admin Panel</h1>
+    <p>Platform overview and management</p>
+  </div>
+  <div class="d-flex gap-1" style="flex-wrap:wrap;">
+    <a href="/auth/dashboard" class="btn btn-secondary"> Users</a>
+    <a href="/lessons/admin" class="btn btn-primary"> Lessons</a>
+    <a href="/quiz/admin" class="btn btn-primary"> Quiz</a>
+  </div>
+</div>
+
+<div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px; margin-bottom:28px;">
+  <div class="stat-card">
+    <div class="num">{{ user_count }}</div>
+    <div class="label">Users</div>
+  </div>
+  <div class="stat-card" style="border-top-color:#16a34a;">
+    <div class="num" style="color:#16a34a;">{{ lesson_count }}</div>
+    <div class="label">Lessons</div>
+  </div>
+  <div class="stat-card" style="border-top-color:#0ea5e9;">
+    <div class="num" style="color:#0ea5e9;">{{ q_count }}</div>
+    <div class="label">Questions</div>
+  </div>
+  <div class="stat-card" style="border-top-color:#d97706;">
+    <div class="num" style="color:#d97706;">{{ report_count }}</div>
+    <div class="label">Pending Reports</div>
+  </div>
+  <div class="stat-card" style="border-top-color:#8b5cf6;">
+    <div class="num" style="color:#8b5cf6;">{{ scan_count }}</div>
+    <div class="label">URL Scans</div>
+  </div>
+</div>
+
+<h3 style="font-size:1.1rem; font-weight:700; margin-bottom:12px; color:#0f172a;"> Threat Reports</h3>
+<div class="card" style="padding:0; overflow:hidden;">
+  <table class="table">
+    <thead><tr><th>URL</th><th>Type</th><th>Status</th><th>Reported</th><th>Action</th></tr></thead>
+    <tbody>
+      {% for r in reports %}
+      <tr>
+        <td style="font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:#2563eb; max-width:240px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.reported_url }}</td>
+        <td style="color:#374151;">{{ r.threat_type or '—' }}</td>
+        <td>
+          <span class="badge {% if r.status == 'pending' %}badge-medium{% else %}badge-low{% endif %}">
+            {{ r.status|capitalize }}
+          </span>
+        </td>
+        <td style="font-size:0.78rem; color:#94a3b8;">{{ r.created_at }}</td>
+        <td>
+          {% if r.status == 'pending' %}
+          <form method="POST" action="/admin/reports/{{ r.id }}/resolve" style="display:inline;">
+            <button type="submit" class="btn btn-success btn-sm">Resolve</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" style="text-align:center; padding:20px; color:#94a3b8;">No reports yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
