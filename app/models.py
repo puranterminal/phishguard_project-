@@ -12,3 +12,6 @@ class User(db.Model):
     password   = db.Column(db.String(255), nullable=False)
     role       = db.Column(db.String(20), default="user")
     created_at = db.Column(db.DateTime, server_default=db.func.now())
+
+    def __repr__(self):
+        return f"<User {self.email}>"
