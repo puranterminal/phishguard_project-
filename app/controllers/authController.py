@@ -7,7 +7,7 @@ from app.repository.user_repo import get_user_by_id
 def login():
     if session.get("user_id"):
         user = get_user_by_id(session["user_id"])
-        if user and user["role"] == "admin":
+        if user and user.role == "admin":
             return redirect(url_for("auth.dashboard"))
         return redirect(url_for("main.home"))
 
