@@ -7,7 +7,7 @@ from app.repository.user_repo import get_user_by_id
 def login():
     if session.get("user_id"):
         user = get_user_by_id(session["user_id"])
-        if user and user.role == "admin":
+        if user and user["role"] == "admin":
             return redirect(url_for("auth.dashboard"))
         return redirect(url_for("main.home"))
 
@@ -30,7 +30,6 @@ def login():
             session["user_id"] = user["id"]
             session["user_name"] = user["name"]
             flash("Login successful!", "success")
-
             if user["role"] == "admin":
                 return redirect(url_for("auth.dashboard"))
             return redirect(url_for("main.home"))
@@ -176,7 +175,6 @@ def profile():
 def editUsers(id):
     conn = get_connection()
     cursor = conn.cursor()
-
     cursor.execute("SELECT * FROM users WHERE id = %s", (id,))
     user = cursor.fetchone()
 
@@ -198,8 +196,7 @@ def editUsers(id):
             return render_template("editUser.html", user=user)
 
         cursor.execute(
-            "SELECT * FROM users WHERE email = %s AND id != %s",
-            (email, id)
+            "SELECT * FROM users WHERE email = %s AND id != %s", (email, id)
         )
         if cursor.fetchone():
             flash("Email already exists.", "danger")
